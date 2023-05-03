@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+<h1>{% block title %} {{ hotel.name }} {% endblock title %}</h1>
+{% block content %}
+<p class=" text-muted">{{ hotel.owner }} | {{ hotel.location }} | {{ hotel.state }}</p>
+        <p class="card-text ">{{ object.description | safe }}</p>
+      
+{% endblock content %}

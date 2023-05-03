@@ -1,0 +1,16 @@
+<h1>Search Results</h1>
+{% extends 'base.html' %}
+{% block content %}
+<ul>
+  {% for hotel in object_list %}
+    
+      <div class="card-body">
+        <h2 class="card-title">{{ hotel.name }}</h2>
+        <p class="card-text text-muted h6">{{ hotel.location }} | {{ hotel.owner}} </p>
+        <p class="card-text">{{hotel.description| safe | truncatewords:25 }}</p>
+        <a href="{% url 'hotel_detail' hotel.slug  %}" class="btn btn-primary">Read More &rarr;</a>
+    </div>
+
+  {% endfor %}
+  {% endblock content %}
+</ul>
