@@ -1,5 +1,6 @@
-from django.http import HttpResponse 
-from django.shortcuts import render,redirect
+from django.http import HttpResponse,HttpResponseRedirect
+from django.urls import reverse
+from django.shortcuts import render,redirect,get_object_or_404
 from Hotel.forms import *
 from .models import *
 from django.contrib.auth import login, authenticate,logout
@@ -7,7 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.views import generic
 from django.db.models import Q
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 class HotelList(generic.ListView):
@@ -142,11 +143,54 @@ def staff_log_page(request):
 def staff_panel(request):
     return render(request,'panel.html')
 
-class HotelDetail(generic.DetailView):
-    model=Hotels
-    template_name='hotel_detail.html'
 
+def hotel_detail(request, hotel_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    return render(request, 'hotel_detail.html', {'hotel': hotel})
 
-def book_room_page(request):
-    model=Hotels
-    template_name ='bookroom.html'
+def book_room(request, hotel_id):
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            hotel = get_object_or_404(Hotels, id=hotel_id)
+            room_type = form.cleaned_data['room_type']
+            check_in = form.cleaned_data['check_in']
+            check_out = form.cleaned_data['check_out']
+            
+            # Find an available room of the selected type at the selected hotel
+            booked_rooms = Booking.objects.filter(
+                room__hotel=hotel,
+                room__room_type=room_type,
+                check_out__gt=check_in,
+                check_in__lt=check_out,
+            ).values_list('room__number', flat=True)
+            
+            available_rooms = Rooms.objects.filter(
+                hotel=hotel,
+                room_type=room_type,
+            ).exclude(number__in=booked_rooms)
+            
+            if available_rooms.exists():
+                room = available_rooms.first()
+                price = room.price * (check_out - check_in).days
+                
+                # Create the booking
+                booking = Booking.objects.create(
+                    room=room,
+                    guest=request.user,
+                    check_in=check_in,
+                    check_out=check_out,
+                    price=price,
+                )
+                
+                return render(request, 'booking_confirmation.html', {'booking': booking})
+            else:
+                return render(request, 'no_rooms_available.html')
+    else:
+        form = BookingForm()
+        
+    return render(request, 'bookroom.html', {'form': form})
+@login_required
+def reservations(request):
+    bookings = Booking.objects.filter(guest=request.user)
+    return render(request, 'reservations.html', {'bookings': bookings})

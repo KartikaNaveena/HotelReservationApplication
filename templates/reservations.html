@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Your Reservations</h1>
+  {% if bookings %}
+    <ul>
+      {% for booking in bookings %}
+        <li>
+          <strong>Hotel:</strong> {{ booking.room.hotel.name }}<br>
+          <strong>Room:</strong> {{ booking.room.number }}<br>
+          <strong>Room type:</strong> {{ booking.room.room_type.name }}<br>
+          <strong>Guest name:</strong> {{ booking.guest }}<br>
+          <strong>Check-in:</strong> {{ booking.check_in }}<br>
+          <strong>Check-out:</strong> {{ booking.check_out }}<br>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no reservations yet.</p>
+  {% endif %}
+{% endblock %}
