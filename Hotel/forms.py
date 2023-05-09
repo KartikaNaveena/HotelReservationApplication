@@ -15,3 +15,11 @@ class BookingForm(forms.Form):
     check_in = forms.DateField()
     check_out = forms.DateField()
 
+class RoomForm(forms.ModelForm):
+    class Meta:
+        model = Rooms
+        fields = ['number', 'room_type', 'price','capacity', 'status']
+class RoomaddForm(forms.ModelForm):
+    class Meta:
+        model = Rooms
+        fields = ['number', 'capacity', 'price', 'status','size','room_type']

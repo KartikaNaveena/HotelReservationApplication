@@ -34,7 +34,7 @@ class Rooms(models.Model):
     capacity = models.IntegerField()
     price = models.IntegerField()
     size = models.IntegerField()
-    hotel = models.ForeignKey(Hotels, on_delete = models.CASCADE)
+    
     status = models.CharField(choices =ROOM_STATUS,max_length = 15)
     number = models.IntegerField()
     def __str__(self):

@@ -11,12 +11,12 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+
 class HotelList(generic.ListView):
     model = Hotels
     context_object_name = 'hotel_list' 
     queryset =Hotels.objects.all()
     template_name = 'index.html'
-
 
 
 
@@ -132,7 +132,7 @@ def staff_log_page(request):
         
         if user.is_staff:
             login(request,user)
-            return redirect('staffpanel')
+            return redirect('hotel_list_for_staff')
         
         else:
             messages.success(request,"Incorrect username or password")
@@ -194,3 +194,64 @@ def book_room(request, hotel_id):
 def reservations(request):
     bookings = Booking.objects.filter(guest=request.user)
     return render(request, 'reservations.html', {'bookings': bookings})
+
+def hotel_list(request):
+    hotels = Hotels.objects.all()
+    context = {'hotels': hotels}
+    return render(request, 'hotel_list.html', context)
+
+def hotel_detail_staff(request, hotel_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    rooms = Rooms.objects.filter(hotel=hotel)
+    bookings = Booking.objects.filter(room__in=rooms)
+    context = {
+        'hotel': hotel,
+        'rooms': rooms,
+        'bookings': bookings,
+    }
+    return render(request, 'hotel_detail_staff.html', context)
+
+def delete_room(request, hotel_id, room_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    room = get_object_or_404(Rooms, id=room_id, hotel=hotel)
+    room.delete()
+    return redirect('hotel_detail_staff', hotel_id=hotel_id)
+
+def edit_room(request, hotel_id, room_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    room = get_object_or_404(Rooms, id=room_id, hotel=hotel)
+    if request.method == 'POST':
+        form = RoomForm(request.POST, instance=room)
+        if form.is_valid():
+            form.save()
+            return redirect('hotel_detail_staff', hotel_id=hotel_id)
+    else:
+        form = RoomForm(instance=room)
+    context = {
+        'hotel': hotel,
+        'room': room,
+        'form': form,
+    }
+    return render(request, 'edit_room.html', context)
+def add_room(request, hotel_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    if request.method == 'POST':
+        form = RoomaddForm(request.POST)
+        if form.is_valid():
+            room = form.save(commit=False)
+            room.hotel = hotel
+            room.save()
+            return redirect('hotel_detail_staff', hotel_id=hotel_id)
+    else:
+        form = RoomaddForm()
+    context = {
+        'hotel': hotel,
+        'form': form,
+    }
+    return render(request, 'add_room.html', context)
+
+def delete_hotel(request, hotel_id):
+    hotel = get_object_or_404(Hotels, id=hotel_id)
+    hotel.delete()
+    return redirect('hotel_list_for_staff')
+            
