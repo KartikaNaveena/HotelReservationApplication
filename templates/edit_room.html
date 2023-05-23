@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Book a room</h1>
+  <h2>Edit Room {{ room.number }}</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Book</button>
+    <input type="submit" value="Save Changes">
   </form>
 {% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ hotel.name }}</h1>
+<p>Total rooms: {{ rooms.count }}, Total bookings: {{ bookings.count }}</p>
+<ul>
+{% for room in rooms %}
+    <li>room number {{ room.number }}  -room type  {{ room.room_type }}  - Rs{{ room.price }}/night - {% if room.bookings.count > 0 %}Booked{% else %}Available{% endif %} - <a href="{% url 'edit_room' hotel_id=hotel.id room_id=room.id %}">Edit</a> - <a href="{% url 'delete_room' hotel_id=hotel.id room_id=room.id %}">Delete</a></li>
+{% empty %}
+    <li>No rooms</li>
+    {% endfor %}
+    <a href="{% url 'add_room' hotel_id=hotel.id %}">Add Room</a>
+    {% endblock content %}
+
+

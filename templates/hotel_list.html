@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Hotels</h1>
+<ul>
+{% for hotel in hotels %}
+    <li><a href="{% url 'hotel_detail_staff' hotel.id %}">{{ hotel.name }}{% if user.is_superuser %}
+        <a href="{% url 'delete_hotel' hotel.id %}">Delete</a>
+      {% endif %}</a></li>
+{% empty %}
+    <li>No hotels available.</li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+ 

@@ -2,7 +2,12 @@
 
 <h1>{% block title %} {{ hotel.name }} {% endblock title %}</h1>
 {% block content %}
+
 <p class=" text-muted">{{ hotel.owner }} | {{ hotel.location }} | {{ hotel.state }}</p>
         <p class="card-text ">{{ object.description | safe }}</p>
-      
+        
+<ul>
+
+</ul>
+<a href="{% url 'book_room' hotel.id   %}" >Book room&rarr;</a>
 {% endblock content %}
